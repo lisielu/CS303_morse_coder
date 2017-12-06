@@ -3,15 +3,15 @@
 //INIT
 morse_coder::morse_coder(){
   std::ifstream fin("morse.txt");
-  Root = new MBTNode<char>(NULL,NULL,'\0');
+  Root = new BTNode<char>('\0', NULL,NULL);
   build_Mtree(Root, fin);
   std::string in;
   fin.open("morse.txt");
   while(fin.good()){
     std::getline(fin,in);
-    char key = in[0];
+    char key = in[0];		//Letter is the key
     std::string morse = in.substr(1);
-    encoder_dict[tolower(key)] = morse;
+    encoder_dict[tolower(key)] = morse;	//builds encoder dictionary
   }
  
 
@@ -21,28 +21,29 @@ morse_coder::morse_coder(){
 
 //WILL TAKE A STRING INPUT IN MORSE CODE (WITH SPACE DELIMITERS)
 //WILL TRANSLATE MORSE CODE INPUT TO ENGLISH OUTPUT
-//BIG-O = O(N^2)
+//BIG-O = O(N*M)
 std::string morse_coder::decode(const std::string& input){
+	result = "";
     std::string holder;
     std::istringstream token(input);
     while(token>>holder){
 	char letter = NULL;
-        find_in_tree(letter,holder, Root);
+        find_in_tree(letter, holder , Root);
         result += letter;
     }
   return result;
 };
 //helper function for "decode()"
-void morse_coder::find_in_tree(char& resultt,std::string& input,MBTNode<char>* local_root){
+void morse_coder::find_in_tree(char& resultt, std::string& input, BTNode<char>* local_root){
     if(input.length() == 0)
         resultt += local_root->data;
     else if(input[0] == '.'){
         input = input.substr(1);
-        find_in_tree(resultt,input, local_root->left);
+        find_in_tree(resultt, input, local_root->left);
     }
     else if(input[0] == '_'){
         input = input.substr(1);
-        find_in_tree(resultt,input, local_root->right);
+        find_in_tree(resultt, input, local_root->right);
     }
     else{
         throw std::invalid_argument("Non-Morse Code Char Encountered...");
@@ -53,7 +54,7 @@ void morse_coder::find_in_tree(char& resultt,std::string& input,MBTNode<char>* l
 
 //BIG-O = O(N*M) WHERE N == morse.size() and M == # of lines in file
 //will set the morse_coder Root to the root of the tree.
-void morse_coder::build_Mtree(MBTNode<char>* local_root, std::ifstream& fin){
+void morse_coder::build_Mtree(BTNode<char>* local_root, std::ifstream& fin){
     if(!fin.good())
         throw std::invalid_argument("Input file must be open for this function: build_Mtree()");
     std::string hold;
@@ -70,7 +71,7 @@ void morse_coder::build_Mtree(MBTNode<char>* local_root, std::ifstream& fin){
 //helper function for "build_Mtree()
 void morse_coder::place_Node(const char value,MBTNode<char>* local_root,std::string& input){
     if(input == ""){
-        local_root->data = value;
+        local_root->data = value; //once Morse string is empty, set value and return
         return;
     }
     else{
@@ -80,7 +81,7 @@ void morse_coder::place_Node(const char value,MBTNode<char>* local_root,std::str
 				place_Node(value, local_root->left, input); //call with local root as left child because code was '.'
 			}
 			else {
-				local_root->left = new MBTNode<char>;
+				local_root->left = new BTNode<char>('\0', NULL, NULL); //create left node
 				input = input.substr(1);
 				place_Node(value, local_root->left, input);
 			}
@@ -90,7 +91,7 @@ void morse_coder::place_Node(const char value,MBTNode<char>* local_root,std::str
 				place_Node(value, local_root->right, input); //call with local root as left child because code was '.'
 			}
 			else {
-				local_root->right = new MBTNode<char>;
+				local_root->right = new BTNode<char>('\0', NULL, NULL); //create right node
 				input = input.substr(1);
 				place_Node(value, local_root->right, input);
 			}
@@ -98,7 +99,6 @@ void morse_coder::place_Node(const char value,MBTNode<char>* local_root,std::str
         
     }
 }
-
 //N == INPUT.LENGTH(); EACH DICTIONARY LOOKUP HAS O(LOG(N)) COMPLEXITY
 //BIG-O == O(NLOG(N)) 
 std::string morse_coder::encode(const std::string& input){
@@ -106,8 +106,6 @@ std::string morse_coder::encode(const std::string& input){
 	std::istringstream tokens(input);
 	char c;
 	while (tokens >> c) {
-
-		//std::cout << c << '\t' << encoder_dict[tolower(c)]<<'\n';
 		if (encoder_dict.find(tolower(c)) != encoder_dict.end()) {
 			result += encoder_dict[tolower(c)];
 			result += ' ';
