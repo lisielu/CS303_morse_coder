@@ -14,8 +14,21 @@ int main(){
   cout << "Original: "
 	   << out
 	   <<"\nEncoded: "
-	   << myCoder.encode(out);
+	   << myCoder.encode(out)
+	  << endl << endl;
 
+const string in2("_._. ._ _");
+const string out2("CAT");
+ cout << "Original: "
+	   << in2
+	   <<"\nDecoded: "
+	   <<myCoder.decode(in2) 
+	   << endl;
+  cout << "Original: "
+	   << out2
+	   <<"\nEncoded: "
+	   << myCoder.encode(out2)
+	  << endl;
   system("pause");
   return 0;
 }
